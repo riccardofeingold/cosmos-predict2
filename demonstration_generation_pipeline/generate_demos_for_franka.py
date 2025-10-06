@@ -121,7 +121,6 @@ def setup_pipeline(args: argparse.Namespace):
     resolution = "480"
     fps = 4
     config = get_cosmos_predict2_action_conditioned_pipeline(model_size=args.model_size, resolution=resolution, fps=fps)
-    print("config.t", config.t)
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:
