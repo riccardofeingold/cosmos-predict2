@@ -35,17 +35,19 @@ from imaginaire.constants import (
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.io import save_image_or_video
 
+def get_action_sequence(annotation_path, return_zero_sequence=False):
+    action = np.zeros((12, 7))
 
-def get_action_sequence(annotation_path):
-    with open(annotation_path) as file:
-        data = json.load(file)
+    if not return_zero_sequence:
+        with open(annotation_path) as file:
+            data = json.load(file)
 
-    # rescale the action to the original scale
-    action_ee = np.array(data["action"])[:, :6] * 20
-    gripper = np.array(data["continuous_gripper_state"])[1:, None]
+        # rescale the action to the original scale
+        action_ee = np.array(data["action"])[:, :6] * 20
+        gripper = np.array(data["continuous_gripper_state"])[1:, None]
 
-    # concatenate the end-effector displacement and gripper width
-    action = np.concatenate([action_ee, gripper], axis=1)
+        # concatenate the end-effector displacement and gripper width
+        action = np.concatenate([action_ee, gripper], axis=1)
     return action
 
 
