@@ -176,7 +176,7 @@ def read_first_frame(video_path):
 def process_single_generation(
     pipe, input_path, input_annotation, output_path, guidance, seed, chunk_size, autoregressive
 ):
-    actions = get_action_sequence(input_annotation)
+    actions = get_action_sequence(input_annotation, return_zero_sequence=True)
     first_frame = read_first_frame(input_path)
 
     log.info(f"Running Video2WorldPipeline\ninput: {input_path}")
