@@ -165,10 +165,10 @@ def main(args):
         download("nvidia/Cosmos-Predict2-2B-Multiview", allow_patterns="*.pt")
 
     if "sample_action_conditioned" in args.model_types:
-        if "2B" in args.model_sizes and "480" in args.resolution and "4" in args.fps:
-            download("nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned")
-        else:
-            print("Sample Action Conditioned model is only available for 2B model size, 480P and 4FPS. Skipping...")
+        # if "2B" in args.model_sizes and "480" in args.resolution and "4" in args.fps:
+        download("nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned")
+        # else:
+        #     print("Sample Action Conditioned model is only available for 2B model size, 480P and 4FPS. Skipping...")
 
     # Download the GR00T models
     if "sample_gr00t_dreams_gr1" in args.model_types:
