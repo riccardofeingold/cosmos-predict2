@@ -36,7 +36,7 @@ from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.io import save_image_or_video
 
 def get_action_sequence(annotation_path, return_zero_sequence=False):
-    action = np.zeros((12, 7))
+    action = np.zeros((100, 7))
 
     if not return_zero_sequence:
         with open(annotation_path) as file:

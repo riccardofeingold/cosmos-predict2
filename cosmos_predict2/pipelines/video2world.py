@@ -515,7 +515,6 @@ class Video2WorldPipeline(BasePipeline):
                 assert data_batch[input_key].dtype == torch.uint8, "Video data is not in uint8 format."
                 data_batch[input_key] = data_batch[input_key].to(**self.tensor_kwargs) / 127.5 - 1.0
                 data_batch[IS_PREPROCESSED_KEY] = True
-
             if self.config.resize_online:
 
                 def temporal_sample(video: torch.Tensor, expected_length: int) -> torch.Tensor:
@@ -523,8 +522,6 @@ class Video2WorldPipeline(BasePipeline):
                     original_length = video.shape[2]
                     if original_length != expected_length:
                         # video in [B C T H W] format
-                        print(f"original_length: {original_length}")
-                        print(f"expected_length: {expected_length}")
                         start_frame = np.random.randint(0, original_length - expected_length)
                         end_frame = start_frame + expected_length
                         video = video[:, :, start_frame:end_frame, :, :]
@@ -532,6 +529,8 @@ class Video2WorldPipeline(BasePipeline):
 
                 expected_length = self.tokenizer.get_pixel_num_frames(self.config.state_t)
                 original_length = data_batch[input_key].shape[2]
+                print("Expected length: ", expected_length)
+                print("Original length: ", original_length)
                 if original_length != expected_length:
                     data_batch[input_key] = temporal_sample(data_batch[input_key], expected_length)
 

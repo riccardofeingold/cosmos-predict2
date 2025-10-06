@@ -112,13 +112,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--prompt",
         type=str,
-        default="",
+        default="Franka robot arm reaching for a red cub placed on a wooden table. ",
         help="Text prompt for video generation",
     )
     parser.add_argument(
         "--input_path",
         type=str,
-        default="assets/video2world/input0.jpg",
+        default="assets/video2world/input_franka.jpg",
         help="Path to input image or video for conditioning (include file extension)",
     )
     parser.add_argument(
