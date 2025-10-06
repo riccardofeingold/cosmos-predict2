@@ -523,6 +523,8 @@ class Video2WorldPipeline(BasePipeline):
                     original_length = video.shape[2]
                     if original_length != expected_length:
                         # video in [B C T H W] format
+                        print(f"original_length: {original_length}")
+                        print(f"expected_length: {expected_length}")
                         start_frame = np.random.randint(0, original_length - expected_length)
                         end_frame = start_frame + expected_length
                         video = video[:, :, start_frame:end_frame, :, :]
