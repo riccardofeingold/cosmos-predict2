@@ -73,13 +73,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--input_video",
         type=str,
-        default="assets/video2world/input1.jpg",
+        default="assets/video2world/input0.jpg",
         help="Path to input image or video for conditioning (include file extension)",
     )
     parser.add_argument(
         "--input_annotation",
         type=str,
-        default="assets/video2world/input1.jpg",
+        default="assets/video2world/input0.jpg",
         help="Path to input image or video for conditioning (include file extension)",
     )
     parser.add_argument(
