@@ -37,6 +37,8 @@ from imaginaire.utils.io import save_image_or_video
 
 def get_action_sequence(annotation_path, return_zero_sequence=False):
     action = np.zeros((100, 7))
+    action[:, 0] = 1.0
+    action[int(action.shape[0] / 2):, -1] = 1.0
 
     if not return_zero_sequence:
         with open(annotation_path) as file:
@@ -73,13 +75,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--input_video",
         type=str,
-        default="assets/video2world/input0.jpg",
+        default="assets/video2world/example_input.jpg",
         help="Path to input image or video for conditioning (include file extension)",
     )
     parser.add_argument(
         "--input_annotation",
         type=str,
-        default="assets/video2world/input0.jpg",
+        default="assets/video2world/example_input.jpg",
         help="Path to input image or video for conditioning (include file extension)",
     )
     parser.add_argument(

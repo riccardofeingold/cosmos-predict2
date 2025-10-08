@@ -22,8 +22,9 @@ from megatron.core import parallel_state
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
 from cosmos_predict2.configs.base.config_video2world import Video2WorldPipelineConfig
 from cosmos_predict2.models.utils import load_state_dict
+from cosmos_predict2.datasets.utils import VIDEO_RES_SIZE_INFO
 from cosmos_predict2.module.denoiser_scaling import RectifiedFlowScaling
-from cosmos_predict2.pipelines.video2world import Video2WorldPipeline
+from cosmos_predict2.pipelines.video2world import Video2WorldPipeline, read_and_process_image
 from cosmos_predict2.schedulers.rectified_flow_scheduler import RectifiedFlowAB2Scheduler
 from cosmos_predict2.utils.context_parallel import cat_outputs_cp, split_inputs_cp
 from imaginaire.auxiliary.text_encoder import CosmosTextEncoderConfig, get_cosmos_text_encoder
@@ -35,7 +36,6 @@ IS_PREPROCESSED_KEY = "is_preprocessed"
 _IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", "webp"]
 _VIDEO_EXTENSIONS = [".mp4"]
 NUM_CONDITIONAL_FRAMES_KEY: str = "num_conditional_frames"
-
 
 class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
     def __init__(self, device: str = "cuda", torch_dtype: torch.dtype = torch.bfloat16):
@@ -234,15 +234,21 @@ class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
         solver_option: str = "2ab",
     ) -> torch.Tensor | None:
         # Parameter check
-        # width, height = VIDEO_RES_SIZE_INFO[self.config.resolution]["16:9"]  # type: ignore
-        # height, width = self.check_resize_height_width(height, width)
+        width, height = VIDEO_RES_SIZE_INFO[self.config.resolution]["16:9"]  # type: ignore
+        height, width = self.check_resize_height_width(height, width)
         assert num_conditional_frames in [1, 5], "num_conditional_frames must be 1 or 5"
         num_latent_conditional_frames = self.tokenizer.get_latent_num_frames(num_conditional_frames)
 
-        # num_video_frames = self.tokenizer.get_pixel_num_frames(self.config.state_t)
+        num_video_frames = self.tokenizer.get_pixel_num_frames(self.config.state_t)
+        print("num_video_frames: ", num_video_frames)
 
         # transform first frame and actions to tensor
-        vid_input = torch.from_numpy(first_frame).permute(2, 0, 1)[None, :, None, ...]
+        first_frame_torch = torch.from_numpy(first_frame).permute(2, 0, 1).to(dtype=torch.uint8)
+        vid_input = torch.zeros((num_video_frames, *first_frame_torch.shape), dtype=torch.uint8)
+        vid_input[0] = first_frame_torch
+        vid_input = vid_input.unsqueeze(0).permute(0, 2, 1, 3, 4)
+        print("video input shape: ", vid_input.shape)
+        # vid_input = torch.from_numpy(first_frame).permute(2, 0, 1)[None, :, None, ...]
         actions_tensor = torch.from_numpy(actions).to(dtype=torch.bfloat16)[None, ...]
 
         # Prepare the data batch with text embeddings
@@ -326,7 +332,6 @@ class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
         # Merge context-parallel chunks back together if needed.
         if self.dit.is_context_parallel_enabled:
             samples = cat_outputs_cp(samples, seq_dim=2, cp_group=self.get_context_parallel_group())
-
         # Decode
         video = self.decode(samples)  # shape: (B, C, T, H, W), possibly out of [-1, 1]
 
